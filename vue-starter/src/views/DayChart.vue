@@ -49,7 +49,7 @@
 
                     let r = (Math.random() * (256))
                     let g = r-10
-                    let b =r-5;
+                    let b =r+15;
                     this.backColor = 'rgb('+r+','+g+','+b+')';
 
                     this.chartdata = {

@@ -45,8 +45,8 @@
                         labels.push(value.name)
                         dataList.push(value.total)
                         let r = (Math.random() * (256))
-                        let g = r-10
-                        let b =r-20;
+                        let g = r-10;
+                        let b =r+10;
                         let backgroundColor = 'rgb('+r+','+g+','+b+')'
                         colorList.push(backgroundColor)
                     })

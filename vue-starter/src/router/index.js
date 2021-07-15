@@ -18,7 +18,7 @@ const routes = [
       dayChart : DayChart,
       issuesList: IssuesList
     }
-  }
+  },
 ]
 
 const router = new VueRouter({
