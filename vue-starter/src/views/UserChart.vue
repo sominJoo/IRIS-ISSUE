@@ -1,53 +1,33 @@
-<h5 class=" mt-3">등록자별 이슈 개수</h5>
-<canvas id="userChart" class="chart-canvas mb-5" ></canvas>
+<canvas id="userChart" class="chart-canvas mb-5"></canvas>
 
-
-<script src="https://unpkg.com/vue"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 <script>
-    import { Bar } from 'vue-chartjs'
     import axios from "axios";
-
+    import {Bar} from 'vue-chartjs'
+    import {options} from "../main.js";
+    import {getBackgroundColor} from "../main.js";
 
     const labels = [];
     const dataList = [];
     const colorList = [];
 
-    const instance = axios.create({
-        baseURL: 'http://localhost:8080',
-        timeout: 100000,
-        headers:
-            {'content-type': 'application/json'}
-    });
-
-    const options ={
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
 
     export default {
         extends: Bar,
         data() {
             return {
                 chartdata: null,
-                issueCountList : []
+                issueCountList: []
             };
         },
-        mounted () {
-            instance
+        mounted() {
+            axios
                 .get('/iris-issues/chart/author')
                 .then(response => {
-                    this.issueCountList = response.data;
-                    this.issueCountList.forEach(function(value,index){
+                    this.issueCountList = response.data.list;
+                    this.issueCountList.forEach(function (value) {
                         labels.push(value.name)
                         dataList.push(value.total)
-                        let r = (Math.random() * (256))
-                        let g = r-10;
-                        let b =r+10;
-                        let backgroundColor = 'rgb('+r+','+g+','+b+')'
+                        let backgroundColor = getBackgroundColor()
                         colorList.push(backgroundColor)
                     })
 
@@ -55,14 +35,15 @@
                         labels: labels,
                         datasets: [{
                             label: '등록자별 이슈',
-                            data:dataList,
+                            data: dataList,
                             backgroundColor: colorList,
                             borderWidth: 1
                         }]
                     };
-                    this.renderChart(this.chartdata, this.options)
-            });
+                    this.renderChart(this.chartdata, options)
+                });
         }
+
     }
 
 </script>

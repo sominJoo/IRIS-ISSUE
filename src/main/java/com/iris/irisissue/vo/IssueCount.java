@@ -21,10 +21,10 @@ public class IssueCount {
     }
 
 
-
     public IssueCount() {
 
     }
+
     public IssueCount(String name, int total) {
         this.name = name;
         this.total = total;

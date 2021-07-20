@@ -9,22 +9,22 @@ import Header from '../views/Header.vue'
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    components: {
-      userChart: UserChart,
-      header: Header,
-      assigneeChart : AssigneeChart,
-      dayChart : DayChart,
-      issuesList: IssuesList
-    }
-  },
+    {
+        path: '/',
+        components: {
+            header: Header,
+            issuesList: IssuesList,
+            assigneeChart: AssigneeChart,
+            dayChart: DayChart,
+            userChart: UserChart
+        }
+    },
 ]
 
 const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes
 })
 
 export default router
