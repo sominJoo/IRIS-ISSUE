@@ -44,10 +44,10 @@ public class IrisIssuesService {
         try {
             String labelUrl = "/repos/mobigen/IRIS/labels?per_page=" + MAX_PER_PAGE;
 
-            String labelResult = ApiConnection(labelUrl);
+            String result = ApiConnection(labelUrl);
 
             JSONParser jsonParser = new JSONParser();
-            JSONArray labelJsonArray = (JSONArray) jsonParser.parse(labelResult);
+            JSONArray labelJsonArray = (JSONArray) jsonParser.parse(result);
 
             for (int i = 0; i < labelJsonArray.size(); i++) {
                 JSONObject jsonObject = (JSONObject) labelJsonArray.get(i);
@@ -330,8 +330,9 @@ public class IrisIssuesService {
     //List Issue Items  저장
     public List<Issue> SearchIssueList(String requestUrl) {
         List<Issue> issueList = new ArrayList<>();
+        String result = null;
         try {
-            String result = ApiConnection(requestUrl);
+            result = ApiConnection(requestUrl);
 
             JSONParser jsonParse = new JSONParser();
             JSONObject jsonObj = (JSONObject) jsonParse.parse(result);
@@ -345,65 +346,12 @@ public class IrisIssuesService {
             }
 
             for (int i = 0; i < itemsArray.size(); i++) {
-                Issue issue = new Issue();
-                JSONObject itemsObj = (JSONObject) itemsArray.get(i);
-
-                //담당자
-                JSONArray assigneesArray = (JSONArray) itemsObj.get("assignees");
-                List<String> assigneeList = new ArrayList<>();
-                String assignee = null;
-                if (assigneesArray.size() == 0) {
-                    assignee = "No Assignee";
-                    assigneeList.add(assignee);
-                } else {
-                    for (int j = 0; j < assigneesArray.size(); j++) {
-                        JSONObject assigneeObj = (JSONObject) assigneesArray.get(j);
-                        assignee = (String) assigneeObj.get("login");
-                        assigneeList.add(assignee);
-                    }
-                }
-
-                //Label
-                JSONArray labelsArray = (JSONArray) itemsObj.get("labels");
-                List<String> labelList = new ArrayList<>();
-                for (int j = 0; j < labelsArray.size(); j++) {
-                    JSONObject labelObj = (JSONObject) labelsArray.get(j);
-                    String labelName = (String) labelObj.get("name");
-                    labelList.add(labelName);
-                }
-
-                JSONObject userObj = (JSONObject) itemsObj.get("user");
-                Object user = (Object) userObj.get("login");
-
-                Object number = (Object) itemsObj.get("number");
-                Object title = (Object) itemsObj.get("title");
-                Object state = (Object) itemsObj.get("state");
-                Object createdAt = (Object) itemsObj.get("created_at");
-                Object closedAt = (Object) itemsObj.get("closed_at");
-
-
-                Date createDate = dateFormat.parse(createdAt.toString());
-                String createDateStr = format.format(createDate);
-
-                String closedDateStr = null;
-                if (closedAt != null) {
-                    Date closeDate = dateFormat.parse(createdAt.toString());
-                    closedDateStr = format.format(closeDate);
-                }
-
-                issue.setNo(number.toString());
-                issue.setTitle(title.toString());
-                issue.setUser(user.toString());
-                issue.setCreated(createDateStr);
-                issue.setCloased(closedDateStr);
-                issue.setState(state.toString());
-                issue.setLabel(labelList);
-                issue.setAssign(assigneeList);
-
+                Issue issue = setIssueData(itemsArray, i);
                 issueList.add(issue);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("SearchIssueList" + result);
         }
         return issueList;
     }
@@ -423,44 +371,77 @@ public class IrisIssuesService {
             }
 
             for (int i = 0; i < itemsArray.size(); i++) {
-                Issue issue = new Issue();
-                JSONObject itemsObj = (JSONObject) itemsArray.get(i);
-
-                //담당자
-                JSONArray assigneesArray = (JSONArray) itemsObj.get("assignees");
-                List<String> assigneeList = new ArrayList<>();
-                String assignee = null;
-                if (assigneesArray.size() == 0) {
-                    assignee = "No Assignee";
-                    assigneeList.add(assignee);
-                } else {
-                    for (int j = 0; j < assigneesArray.size(); j++) {
-                        JSONObject assigneeObj = (JSONObject) assigneesArray.get(j);
-                        assignee = (String) assigneeObj.get("login");
-                        assigneeList.add(assignee);
-                    }
-                }
-
-                //등록자
-                JSONObject userObj = (JSONObject) itemsObj.get("user");
-                Object user = (Object) userObj.get("login");
-
-                //생성날짜
-                Object createdAt = (Object) itemsObj.get("created_at");
-
-                Date createDate = dateFormat.parse(createdAt.toString());
-                String createDateStr = format.format(createDate);
-
-                issue.setUser(user.toString());
-                issue.setAssign(assigneeList);
-                issue.setCreated(createDateStr);
-
+                Issue issue = setIssueData(itemsArray, i);
                 chartIssueList.add(issue);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("ChartIssueList" + result);
+            System.out.println("ReposIssueList" + result);
         }
         return chartIssueList;
+    }
+
+
+    public Issue setIssueData(JSONArray itemsArray, int index) {
+        Issue issue = new Issue();
+        try {
+            JSONObject itemsObj = (JSONObject) itemsArray.get(index);
+
+            //담당자
+            JSONArray assigneesArray = (JSONArray) itemsObj.get("assignees");
+            List<String> assigneeList = new ArrayList<>();
+            String assignee = null;
+            if (assigneesArray.size() == 0) {
+                assignee = "No Assignee";
+                assigneeList.add(assignee);
+            } else {
+                for (int j = 0; j < assigneesArray.size(); j++) {
+                    JSONObject assigneeObj = (JSONObject) assigneesArray.get(j);
+                    assignee = (String) assigneeObj.get("login");
+                    assigneeList.add(assignee);
+                }
+            }
+
+            //Label
+            JSONArray labelsArray = (JSONArray) itemsObj.get("labels");
+            List<String> labelList = new ArrayList<>();
+            for (int j = 0; j < labelsArray.size(); j++) {
+                JSONObject labelObj = (JSONObject) labelsArray.get(j);
+                String labelName = (String) labelObj.get("name");
+                labelList.add(labelName);
+            }
+
+            JSONObject userObj = (JSONObject) itemsObj.get("user");
+            Object user = (Object) userObj.get("login");
+
+            Object number = (Object) itemsObj.get("number");
+            Object title = (Object) itemsObj.get("title");
+            Object state = (Object) itemsObj.get("state");
+            Object createdAt = (Object) itemsObj.get("created_at");
+            Object closedAt = (Object) itemsObj.get("closed_at");
+
+
+            Date createDate = dateFormat.parse(createdAt.toString());
+            String createDateStr = format.format(createDate);
+
+            String closedDateStr = null;
+            if (closedAt != null) {
+                Date closeDate = dateFormat.parse(createdAt.toString());
+                closedDateStr = format.format(closeDate);
+            }
+
+            issue.setNo(number.toString());
+            issue.setTitle(title.toString());
+            issue.setUser(user.toString());
+            issue.setCreated(createDateStr);
+            issue.setCloased(closedDateStr);
+            issue.setState(state.toString());
+            issue.setLabel(labelList);
+            issue.setAssign(assigneeList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return issue;
     }
 }

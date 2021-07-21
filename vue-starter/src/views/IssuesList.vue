@@ -5,7 +5,8 @@
                     name="searchFrm"
                     id="searchFrm"
                     class="border mb-3"
-                    @submit.prevent="onSubmitFrm">
+                    @submit.prevent="onSubmitFrm"
+                    >
                 <div class="d-flex justify-content-center form-dic">
                     <h6 class=" m-2">필터조건</h6>
                     <div class="resolveStatus m-2">
@@ -107,17 +108,6 @@
                 endDate: ''
             }
         },
-        mounted() {
-            //label data
-            axios
-                .get('/iris-issues/issues/label')
-                .then(response => {
-                    this.labelList = response.data;
-                });
-
-            //list data
-            this.getIssueList();
-        },
         methods: {
             //page 이동
             pageList: function (button, page) {
@@ -176,8 +166,20 @@
                     .then(response => {
                         this.issueList = response.data.issueList
                         this.totalRows = response.data.totalCount;
+                        document.getElementById("issue-table").scrollIntoView();
                     });
             }
+        },
+        mounted() {
+            //label data
+            axios
+                .get('/iris-issues/issues/label')
+                .then(response => {
+                    this.labelList = response.data;
+                });
+
+            //list data
+            this.getIssueList();
         }
     };
 </script>
