@@ -12,14 +12,6 @@
 <script>
     import axios from "axios";
 
-    const instance = axios.create({
-        baseURL: 'http://localhost:8080',
-        timeout: 100000,
-        headers:
-            {'content-type': 'application/json'}
-
-    });
-
     export default {
         data() {
             return {
@@ -27,7 +19,7 @@
             }
         },
         mounted() {
-            instance
+            axios
                 .get('/iris-issues/count')
                 .then(response => {
                     this.issueCountList = response.data.list;

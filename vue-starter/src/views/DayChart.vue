@@ -11,11 +11,10 @@
     const dataList = [];
 
     export default {
-        name: 'day-chart',
         extends: Line,
         data() {
             return {
-                chartdata: null,
+                chartData: null,
                 issueCountList: [],
                 backColor: null
             };
@@ -31,7 +30,7 @@
                     })
                     this.backColor = 'rgb(123,113,138)';
 
-                    this.chartdata = {
+                    this.chartData = {
                         labels: labels,
                         datasets: [{
                             label: '날짜별 이슈(1개월)',
@@ -42,7 +41,7 @@
                             tension: 0.1
                         }]
                     };
-                    this.renderChart(this.chartdata, options)
+                    this.renderChart(this.chartData, options)
                 });
         }
     }

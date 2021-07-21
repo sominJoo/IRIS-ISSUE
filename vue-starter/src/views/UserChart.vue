@@ -15,7 +15,7 @@
         extends: Bar,
         data() {
             return {
-                chartdata: null,
+                chartData: null,
                 issueCountList: []
             };
         },
@@ -31,7 +31,7 @@
                         colorList.push(backgroundColor)
                     })
 
-                    this.chartdata = {
+                    this.chartData = {
                         labels: labels,
                         datasets: [{
                             label: '등록자별 이슈',
@@ -40,7 +40,7 @@
                             borderWidth: 1
                         }]
                     };
-                    this.renderChart(this.chartdata, options)
+                    this.renderChart(this.chartData, options)
                 });
         }
 

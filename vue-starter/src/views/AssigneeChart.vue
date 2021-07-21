@@ -33,9 +33,8 @@
         extends: Pie,
         data() {
             return {
-                chartdata: null,
-                issueCountList: [],
-                isLoading: true
+                chartData: null,
+                issueCountList: []
             };
         },
         mounted() {
@@ -50,7 +49,7 @@
                         colorList.push(backgroundColor)
                     })
 
-                    this.chartdata = {
+                    this.chartData = {
                         labels: labels,
                         datasets: [{
                             label: '담당자별 이슈',
@@ -59,9 +58,8 @@
                             borderWidth: 1
                         }]
                     };
-                    this.isLoading = false;
 
-                    this.renderChart(this.chartdata, options)
+                    this.renderChart(this.chartData, options)
                 });
         }
     }

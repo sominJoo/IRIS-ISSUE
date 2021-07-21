@@ -52,7 +52,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-if="issueList.length<=1">
+
+                <tr class="text-center" v-if="currentPage == 1">
+                    <td colspan="7">총 {{totalRows}}개 존재</td>
+                </tr>
+
+                <tr class="text-center" v-if="issueList.length<1">
                     <td colspan="7"> 데이터없음</td>
                 </tr>
 
@@ -110,6 +115,7 @@
                     this.labelList = response.data;
                 });
 
+            //list data
             this.getIssueList();
         },
         methods: {
