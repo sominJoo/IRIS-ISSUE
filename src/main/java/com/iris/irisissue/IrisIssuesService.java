@@ -5,6 +5,7 @@ import com.iris.irisissue.vo.IssueCount;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ public class IrisIssuesService {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
+    //issue label
     public List<String> labelList() {
         List<String> labelList = new ArrayList<>();
         try {
@@ -60,6 +62,8 @@ public class IrisIssuesService {
         return labelList;
     }
 
+
+    //오픈, 해결 이슈 수
     public Map<String, Object> IsseuCounting() {
         Map<String, Object> map = new HashMap<>();
         List<IssueCount> issueCountList = new ArrayList<>();
@@ -86,6 +90,7 @@ public class IrisIssuesService {
         return map;
     }
 
+    //issue list
     public Map<String, Object> IsseuList(Map<String, Object> map) {
         Map<String, Object> issueMap = new HashMap<>();
         try {
@@ -124,11 +129,13 @@ public class IrisIssuesService {
             String pageStr = "&per_page=" + LIST_PER_PAGE + "&page=" + map.get("page").toString();
             searchUrl += pageStr;
 
-            List<Issue> issueList = SearchIssueList(searchUrl) == null ? new ArrayList<>() : SearchIssueList(searchUrl);
+            List<Issue> issueList = SearchIssueList(searchUrl);
+            if (issueList == null) {
+                issueList = new ArrayList<>();
+            }
 
             issueMap.put("issueList", issueList);
             issueMap.put("totalCount", listTotalCount);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,13 +148,11 @@ public class IrisIssuesService {
         Map<String, Object> map = new HashMap<>();
         try {
             String chartUrl = "/repos/mobigen/IRIS/issues" + "?per_page=" + MAX_PER_PAGE + "&state=all";
-            List<List<Issue>> issueUserList = setChartData(chartUrl);
+            List<Issue> issueList = setChartData(chartUrl);
 
             List<String> userList = new ArrayList<>();
-            for (List<Issue> issueList : issueUserList) {
-                for (Issue issue : issueList) {
-                    userList.add(issue.getUser());
-                }
+            for (Issue issue : issueList) {
+                userList.add(issue.getUser());
             }
 
             List<IssueCount> issueCountList = Statistics(userList);
@@ -164,15 +169,14 @@ public class IrisIssuesService {
         Map<String, Object> map = new HashMap<>();
         try {
             String chartUrl = "/repos/mobigen/IRIS/issues" + "?per_page=" + MAX_PER_PAGE + "&state=all";
-            List<List<Issue>> issueAssignList = setChartData(chartUrl);
+
+            List<Issue> issueList = setChartData(chartUrl);
 
             //2. 전체 Issues 리스트값
             List<String> assigneeList = new ArrayList<>();
-            for (List<Issue> issueList : issueAssignList) {
-                for (Issue issue : issueList) {
-                    for (String assignee : issue.getAssign())
-                        assigneeList.add(assignee);
-                }
+            for (Issue issue : issueList) {
+                for (String assignee : issue.getAssign())
+                    assigneeList.add(assignee);
             }
 
             List<IssueCount> issueCountList = Statistics(assigneeList);
@@ -259,18 +263,29 @@ public class IrisIssuesService {
         return total_count;
     }
 
+
     //Chart Data
-    public List<List<Issue>> setChartData(String chartUrl) {
+    public List<Issue> setChartData(String chartUrl) throws ParseException {
         List<List<Issue>> issue_list = new ArrayList<>();
+        List<Issue> chartIssueList = new ArrayList<>();
         int i = 0;
         while (true) {
             String requestUrl = chartUrl + "&page=" + ++i;
-            List<Issue> list = ReposIssueList(requestUrl);
-            if (list == null)
+            String result = ApiConnection(requestUrl);
+
+            JSONParser jsonParse = new JSONParser();
+            JSONArray itemsArray = (JSONArray) jsonParse.parse(result);
+
+            if (itemsArray.size() <= 0) {
                 break;
-            issue_list.add(list);
+            }
+
+            for (int j = 0; j < itemsArray.size(); j++) {
+                Issue issue = setIssueData(itemsArray, j);
+                chartIssueList.add(issue);
+            }
         }
-        return issue_list;
+        return chartIssueList;
     }
 
     //Url 연결
@@ -354,31 +369,6 @@ public class IrisIssuesService {
             System.out.println("SearchIssueList" + result);
         }
         return issueList;
-    }
-
-
-    //Chart Day Issue Items  저장
-    public List<Issue> ReposIssueList(String requestUrl) {
-        String result = null;
-        List<Issue> chartIssueList = new ArrayList<>();
-        try {
-            result = ApiConnection(requestUrl);
-
-            JSONParser jsonParse = new JSONParser();
-            JSONArray itemsArray = (JSONArray) jsonParse.parse(result);
-            if (itemsArray.size() <= 0) {
-                return null;
-            }
-
-            for (int i = 0; i < itemsArray.size(); i++) {
-                Issue issue = setIssueData(itemsArray, i);
-                chartIssueList.add(issue);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("ReposIssueList" + result);
-        }
-        return chartIssueList;
     }
 
 
